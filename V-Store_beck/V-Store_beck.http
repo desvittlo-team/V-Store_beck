@@ -1,0 +1,6 @@
+@V_Store_beck_HostAddress = http://localhost:5245
+
+GET {{V_Store_beck_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
