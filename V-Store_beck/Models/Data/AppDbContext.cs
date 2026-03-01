@@ -71,6 +71,18 @@ namespace AspNetCore.WebAPI.Data
                 new Game { Id = 47, Name = "Journey", Surname = "Thatgamecompany", Age = 76, GPA = 9.4, Photo = "journey.png" },
                 new Game { Id = 48, Name = "Outer Wilds", Surname = "Mobius Digital", Age = 89, GPA = 9.9, Photo = "outer_wilds.png" }
             );
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Username = "admin",
+                    Email = "admin@vstore.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    Role = "Admin",
+                    Photo = "User.png"
+                }
+            );
         }
+
     }
 }

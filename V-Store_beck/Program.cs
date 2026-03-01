@@ -41,7 +41,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.UseStaticFiles();
 app.UseCors("AllowReact");
 app.UseAuthentication();
 app.UseAuthorization();
