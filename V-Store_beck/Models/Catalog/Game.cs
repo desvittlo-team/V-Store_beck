@@ -1,18 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace VStore.Models.Catalog;
-
-public class Game
+namespace AspNetCore.WebAPI.Models
 {
-    public int Id { get; set; }
+    public class Game
+    {
+        public int Id { get; set; }
 
-    [Required]
-    public string Title { get; set; } = null!;
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+        [Required]
+        public string Surname { get; set; } = string.Empty;
 
-    [Range(0, 100000)]
-    public decimal Price { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int Age { get; set; }
+        public double GPA { get; set; }
+        public string Photo { get; set; } = string.Empty;
+    }
 }

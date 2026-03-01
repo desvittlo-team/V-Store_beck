@@ -1,45 +1,81 @@
+// Controllers/User/AuthController.cs
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VStore.Data;
-using VStore.Services.Core;
+using AspNetCore.WebAPI.Models;
+using AspNetCore.WebAPI.Services;
 
-namespace VStore.Controllers.User;
-
-[ApiController]
-[Route("api/auth")]
-public class AuthController : ControllerBase
+namespace AspNetCore.WebAPI.Controllers
 {
-    private readonly AuthService _authService;
-    private readonly AppDbContext _context;
-
-    public AuthController(AuthService authService, AppDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
-        _authService = authService;
-        _context = context;
+        private readonly AuthService _authService;
+
+        public AuthController(AuthService authService)
+        {
+            _authService = authService;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            try
+            {
+                var user = await _authService.Register(request.Username, request.Email, request.Password);
+                var token = _authService.GenerateJwt(user);
+
+                return Ok(new AuthResult
+                {
+                    Token = token,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Role = user.Role
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var user = await _authService.Login(request.Email, request.Password);
+
+            if (user is null)
+                return Unauthorized(new { message = "Invalid email or password" });
+
+            var token = _authService.GenerateJwt(user);
+
+            return Ok(new AuthResult
+            {
+                Token = token,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role
+            });
+        }
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(string username, string email, string password)
+    public class RegisterRequest
     {
-        if (await _context.Users.AnyAsync(x => x.Email == email))
-            return BadRequest("Email already exists");
-
-        var user = await _authService.Register(username, email, password);
-        return Ok(user);
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(string email, string password)
+    public class LoginRequest
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            return Unauthorized();
-
-        if (user.IsBlocked)
-            return Forbid();
-
-        var token = _authService.GenerateJwt(user);
-        return Ok(new { token });
+    public class AuthResult
+    {
+        public string Token { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
     }
 }

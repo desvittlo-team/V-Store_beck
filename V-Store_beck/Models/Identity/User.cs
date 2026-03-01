@@ -1,21 +1,23 @@
+// Models/Identity/User.cs
 using System.ComponentModel.DataAnnotations;
 
-namespace VStore.Models.Identity;
-
-public class User
+namespace AspNetCore.WebAPI.Models
 {
-    public int Id { get; set; }
+    public class User
+    {
+        public int Id { get; set; }
 
-    [Required]
-    public string Username { get; set; } = null!;
+        [Required]
+        public string Username { get; set; } = string.Empty;
 
-    [Required]
-    public string Email { get; set; } = null!;
+        [Required]
+        public string Email { get; set; } = string.Empty;
 
-    [Required]
-    public string PasswordHash { get; set; } = null!;
+        [Required]
+        public string PasswordHash { get; set; } = string.Empty;
 
-    public string Role { get; set; } = "User";
+        public string Role { get; set; } = "User";
 
-    public bool IsBlocked { get; set; } = false;
+        public string Photo { get; set; } = "User.png";
+    }
 }

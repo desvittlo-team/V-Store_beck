@@ -1,58 +1,79 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using VStore.Data;
-using VStore.Models.Identity;
+using AspNetCore.WebAPI.Data;
+using AspNetCore.WebAPI.Models;
 
-namespace VStore.Services.Core;
-
-public class AuthService
+namespace AspNetCore.WebAPI.Services
 {
-    private readonly AppDbContext _context;
-    private readonly IConfiguration _config;
-
-    public AuthService(AppDbContext context, IConfiguration config)
+    public class AuthService
     {
-        _context = context;
-        _config = config;
-    }
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
-    public async Task<User> Register(string username, string email, string password)
-    {
-        var user = new User
+        public AuthService(AppDbContext context, IConfiguration config)
         {
-            Username = username,
-            Email = email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
-        };
+            _context = context;
+            _config = config;
+        }
 
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
-    public string GenerateJwt(User user)
-    {
-        var claims = new[]
+        public async Task<User> Register(string username, string email, string password)
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
-        };
+            if (await _context.Users.AnyAsync(u => u.Email == email))
+                throw new InvalidOperationException("Email already taken");
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
-        );
+            if (await _context.Users.AnyAsync(u => u.Username == username))
+                throw new InvalidOperationException("Username already taken");
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var user = new User
+            {
+                Username = username,
+                Email = email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+            };
 
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
-            signingCredentials: creds
-        );
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            return user;
+        }
+
+        public async Task<User?> Login(string email, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                return null;
+
+            return user;
+        }
+
+        public string GenerateJwt(User user)
+        {
+            var jwtKey = _config["Jwt:Key"]
+                ?? throw new InvalidOperationException("Jwt:Key is not configured");
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

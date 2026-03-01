@@ -1,9 +1,11 @@
+using AspNetCore.WebAPI.Data;
+using AspNetCore.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using VStore.Data;
-using VStore.Services.Core;
+//using VStore.Data;
+//using VStore.Services.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
