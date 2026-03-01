@@ -15,7 +15,9 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<Game> Game { get; set; }
         public DbSet<Screenshot> Screenshots { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Seed data for Students
