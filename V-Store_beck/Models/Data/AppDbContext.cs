@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using AspNetCore.WebAPI.Models;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 //using VStore.Models.Catalog;
 
@@ -77,7 +78,8 @@ namespace AspNetCore.WebAPI.Data
                     Id = 1,
                     Username = "admin",
                     Email = "admin@vstore.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    // Use a static precomputed hash here to avoid dynamic values in HasData
+                    PasswordHash = "$2a$11$KIX7YB1r0A2Gx6GxVqQe6OLt6qj1Q6i8zB8uYwYh9a1b2c3d4e5fO",
                     Role = "Admin",
                     Photo = "User.png"
                 }
