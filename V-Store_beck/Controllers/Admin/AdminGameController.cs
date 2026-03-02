@@ -70,6 +70,21 @@ namespace AspNetCore.WebAPI.Controllers
 
             return Ok(new { message = "Game deleted" });
         }
+        [HttpPost("upload")]
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            if (file is null || file.Length == 0)
+                return BadRequest(new { message = "No file" });
+
+            var fileName = Path.GetFileName(file.FileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "pics", fileName);
+
+            using var stream = new FileStream(path, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            return Ok(new { fileName });
+        }
     }
 
     public class GameRequest
