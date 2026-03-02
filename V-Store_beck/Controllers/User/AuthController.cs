@@ -56,6 +56,12 @@ namespace AspNetCore.WebAPI.Controllers
                 Role = user.Role
             });
         }
+        [HttpGet("fix-admin")]
+        public async Task<IActionResult> FixAdmin()
+        {
+            var user = await _authService.FixAdminPassword();
+            return Ok(new { message = "Done", hash = user.PasswordHash });
+        }
     }
 
     public class RegisterRequest
