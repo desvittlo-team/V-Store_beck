@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AspNetCore.WebAPI.Controllers
 {
@@ -13,10 +14,12 @@ namespace AspNetCore.WebAPI.Controllers
     public class AdminGameController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public AdminGameController(AppDbContext context)
+        public AdminGameController(AppDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         // POST api/admin/games
@@ -70,17 +73,24 @@ namespace AspNetCore.WebAPI.Controllers
 
             return Ok(new { message = "Game deleted" });
         }
-        [HttpPost("upload")]
-        [HttpPost("upload")]
+
+        // POST api/admin/upload
+        [HttpPost("/api/admin/upload")]
+        [AllowAnonymous]
         public async Task<IActionResult> UploadPhoto(IFormFile file)
         {
             if (file is null || file.Length == 0)
                 return BadRequest(new { message = "No file" });
 
             var fileName = Path.GetFileName(file.FileName);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "pics", fileName);
+            // простая санитизация имени
+            fileName = System.Text.RegularExpressions.Regex.Replace(fileName, @"[^\w\-.]", "_");
 
-            using var stream = new FileStream(path, FileMode.Create);
+            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Directory.GetCurrentDirectory(), "pics");
+            Directory.CreateDirectory(uploadsFolder); // ключевое: гарантируем существование директории
+
+            var path = Path.Combine(uploadsFolder, fileName);
+            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
             await file.CopyToAsync(stream);
 
             return Ok(new { fileName });

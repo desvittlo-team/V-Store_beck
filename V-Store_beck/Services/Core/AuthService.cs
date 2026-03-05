@@ -13,62 +13,99 @@ namespace AspNetCore.WebAPI.Services
         private readonly AppDbContext _context;
         private readonly IConfiguration _config;
 
+        private const string DefaultUserRole = "User";
+
         public AuthService(AppDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
         }
 
+        // =========================
+        // REGISTER
+        // =========================
         public async Task<User> Register(string username, string email, string password)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == email))
-                throw new InvalidOperationException("Email already taken");
-            if (await _context.Users.AnyAsync(u => u.Username == username))
-                throw new InvalidOperationException("Username already taken");
+            // нормализуем email
+            email = email.ToLower().Trim();
+
+            // один запрос вместо двух
+            bool exists = await _context.Users
+                .AnyAsync(u => u.Email == email || u.Username == username);
+
+            if (exists)
+                throw new InvalidOperationException("User with this email or username already exists");
 
             var user = new User
             {
                 Username = username,
                 Email = email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                Role = DefaultUserRole
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
             return user;
         }
 
+        // =========================
+        // LOGIN
+        // =========================
         public async Task<User?> Login(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            email = email.ToLower().Trim();
 
-            if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            var user = await _context.Users
+                .AsNoTracking() // оптимизация (не нужно отслеживание EF)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
                 return null;
 
-            if (user.Username == "admin")
-                user.Role = "Admin";
+            bool validPassword = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+
+            if (!validPassword)
+                return null;
 
             return user;
         }
 
+        // =========================
+        // JWT GENERATION
+        // =========================
         public string GenerateJwt(User user)
         {
-            var jwtKey = _config["Jwt:Key"]
-                ?? throw new InvalidOperationException("Jwt:Key is not configured");
+            string jwtKey = _config["Jwt:Key"]
+                ?? throw new InvalidOperationException("Jwt:Key not configured");
 
-            var claims = new[]
+            string issuer = _config["Jwt:Issuer"]
+                ?? throw new InvalidOperationException("Jwt:Issuer not configured");
+
+            string audience = _config["Jwt:Audience"]
+                ?? throw new InvalidOperationException("Jwt:Audience not configured");
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey)
+            );
+
+            var creds = new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256
+            );
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
@@ -77,13 +114,21 @@ namespace AspNetCore.WebAPI.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<User> FixAdminPassword()
+        // =========================
+        // ADMIN PASSWORD RESET (DEV)
+        // =========================
+        public async Task<User?> FixAdminPassword()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
-            if (user is null) return null!;
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == "admin");
+
+            if (user == null)
+                return null;
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123");
+
             await _context.SaveChangesAsync();
+
             return user;
         }
     }
