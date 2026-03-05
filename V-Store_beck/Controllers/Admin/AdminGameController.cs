@@ -86,7 +86,7 @@ namespace AspNetCore.WebAPI.Controllers
             // простая санитизация имени
             fileName = System.Text.RegularExpressions.Regex.Replace(fileName, @"[^\w\-.]", "_");
 
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Directory.GetCurrentDirectory(), "pics");
+            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Directory.GetCurrentDirectory(), "images");
             Directory.CreateDirectory(uploadsFolder); // ключевое: гарантируем существование директории
 
             var path = Path.Combine(uploadsFolder, fileName);
