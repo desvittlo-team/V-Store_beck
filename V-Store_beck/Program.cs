@@ -50,6 +50,18 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+
+app.UseStaticFiles(); 
+
+// раздача папки screenshots
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "screenshots")
+    ),
+    RequestPath = "/screenshots"
+});
+
 app.UseStaticFiles();
 app.UseCors("AllowReact");
 app.UseAuthentication();
