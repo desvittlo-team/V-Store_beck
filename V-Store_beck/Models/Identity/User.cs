@@ -19,5 +19,6 @@ namespace AspNetCore.WebAPI.Models
         public string Role { get; set; } = "User";
 
         public string Photo { get; set; } = "User.png";
+        public decimal Balance { get; set; } = 1000m;
     }
 }

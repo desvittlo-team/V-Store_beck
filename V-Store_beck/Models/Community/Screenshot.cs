@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace AspNetCore.WebAPI.Models
+﻿namespace AspNetCore.WebAPI.Models
 {
     public class Screenshot
     {
         public int Id { get; set; }
-
-        [Required]
-        public string ImageUrl { get; set; } = string.Empty;
-
-        [Required]
-        public string Title { get; set; } = string.Empty;
-
-        [Required]
-        public string Author { get; set; } = string.Empty;
-
-        public int Rating { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
+        public string FileName { get; set; } = string.Empty;
+        public string? Caption { get; set; }
+        public int Likes { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
-}
+}   

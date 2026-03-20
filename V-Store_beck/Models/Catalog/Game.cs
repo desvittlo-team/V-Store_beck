@@ -15,5 +15,7 @@ namespace AspNetCore.WebAPI.Models
         public int Age { get; set; }
         public double GPA { get; set; }
         public string Photo { get; set; } = string.Empty;
+
+        public decimal Price { get; set; } = 0m;
     }
 }
