@@ -20,6 +20,8 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+
+        public DbSet<Message> Messages { get; set; }  // <- добавь эту ст
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Seed data for Students
@@ -86,6 +88,17 @@ namespace AspNetCore.WebAPI.Data
 
                 }
             );
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+             modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

@@ -26,6 +26,7 @@ namespace AspNetCore.WebAPI.Controllers
 
                 return Ok(new AuthResult
                 {
+                    Id = user.Id,
                     Token = token,
                     Username = user.Username,
                     Email = user.Email,
@@ -50,6 +51,7 @@ namespace AspNetCore.WebAPI.Controllers
 
             return Ok(new AuthResult
             {
+                Id = user.Id,
                 Token = token,
                 Username = user.Username,
                 Email = user.Email,
@@ -72,13 +74,15 @@ namespace AspNetCore.WebAPI.Controllers
     }
 
     public class LoginRequest
-    {
+    {   
+
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
 
     public class AuthResult
     {
+        public int Id { get; set; }
         public string Token { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;

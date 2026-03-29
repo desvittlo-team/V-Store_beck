@@ -21,7 +21,7 @@ namespace AspNetCore.WebAPI.Services
             _config = config;
         }
 
-        // =========================
+        // =========================са
         // REGISTER
         // =========================
         public async Task<User> Register(string username, string email, string password)
@@ -37,7 +37,8 @@ namespace AspNetCore.WebAPI.Services
                 throw new InvalidOperationException("User with this email or username already exists");
 
             var user = new User
-            {
+            {   
+
                 Username = username,
                 Email = email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
@@ -130,6 +131,14 @@ namespace AspNetCore.WebAPI.Services
             await _context.SaveChangesAsync();
 
             return user;
+        }
+        public class AuthResult
+        {
+            public int Id { get; set; }  // <- добавь
+            public string Token { get; set; } = string.Empty;
+            public string Username { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
         }
     }
 }
