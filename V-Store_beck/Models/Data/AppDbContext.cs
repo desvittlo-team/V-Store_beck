@@ -20,6 +20,7 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<GlobalMessage> GlobalMessages { get; set; }
 
         public DbSet<Message> Messages { get; set; }  // <- добавь эту ст
         protected override void OnModelCreating(ModelBuilder modelBuilder)
