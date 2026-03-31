@@ -61,7 +61,20 @@ app.UseStaticFiles(new StaticFileOptions
     ),
     RequestPath = "/screenshots"
 });
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars")
+    ),
+    RequestPath = "/avatars"
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "items")
+    ),
+    RequestPath = "/items"
+});
 app.UseStaticFiles();
 app.UseCors("AllowReact");
 app.UseAuthentication();

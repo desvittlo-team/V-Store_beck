@@ -21,6 +21,8 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<GlobalMessage> GlobalMessages { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<InventoryItem> InventoryItems { get; set; }
 
         public DbSet<Message> Messages { get; set; }  // <- добавь эту ст
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -99,6 +101,18 @@ namespace AspNetCore.WebAPI.Data
                 .HasOne(m => m.Receiver)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.Seller)
+                .WithMany()
+                .HasForeignKey(i => i.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+             modelBuilder.Entity<Item>()
+                .HasOne(i => i.Game)
+                .WithMany()
+                .HasForeignKey(i => i.GameId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
