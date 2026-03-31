@@ -173,6 +173,70 @@ namespace AspNetCore.WebAPI.Controllers
 
             return Ok(inventory);
         }
+
+        // POST api/market/inventory/{inventoryItemId}/sell — юзер выставляет свой предмет
+        [HttpPost("inventory/{inventoryItemId}/sell")]
+        [Authorize]
+        public async Task<IActionResult> SellFromInventory(int inventoryItemId, [FromBody] SellItemRequest request)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var invItem = await _db.InventoryItems
+                .Include(ii => ii.Item)
+                .FirstOrDefaultAsync(ii => ii.Id == inventoryItemId && ii.UserId == userId);
+
+            if (invItem == null)
+                return NotFound(new { message = "Предмет не знайдено в інвентарі" });
+
+            if (request.Price <= 0)
+                return BadRequest(new { message = "Ціна повинна бути більше 0" });
+
+            // создаём новый лот на рынке
+            var newItem = new Item
+            {
+                Name = invItem.Item.Name,
+                Description = invItem.Item.Description,
+                Photo = invItem.Item.Photo,
+                Price = request.Price,
+                GameId = invItem.Item.GameId,
+                SellerId = userId
+            };
+
+            _db.Items.Add(newItem);
+
+            // удаляем из инвентаря
+            _db.InventoryItems.Remove(invItem);
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new { newItem.Id, newItem.Name, newItem.Price });
+        }
+
+        // GET api/market/inventory/my — инвентарь для продажи
+        [HttpGet("inventory/my")]
+        [Authorize]
+        public async Task<IActionResult> GetMyInventory()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var inventory = await _db.InventoryItems
+                .Where(ii => ii.UserId == userId)
+                .Include(ii => ii.Item)
+                    .ThenInclude(i => i.Game)
+                .OrderByDescending(ii => ii.AcquiredAt)
+                .Select(ii => new {
+                    ii.Id,
+                    ii.AcquiredAt,
+                    Item = new {
+                        ii.Item.Id, ii.Item.Name, ii.Item.Photo,
+                        ii.Item.Price, ii.Item.Description,
+                        Game = new { ii.Item.Game.Id, ii.Item.Game.Name }
+                    }
+                })
+                .ToListAsync();
+
+            return Ok(inventory);
+        }
     }
 
     public class CreateItemRequest
@@ -182,4 +246,10 @@ namespace AspNetCore.WebAPI.Controllers
         public decimal Price { get; set; }
         public int GameId { get; set; }
     }
+
+    public class SellItemRequest
+    {
+        public decimal Price { get; set; }
+    }
+
 }
