@@ -39,7 +39,20 @@ namespace AspNetCore.WebAPI.Controllers
                     Username = s.User.Username
                 })
                 .ToListAsync();
-            return Ok(screenshots);
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var result = screenshots.Select(s => new {
+                s.Id,
+                s.FileName,
+                Url = string.IsNullOrEmpty(s.FileName) ? null : $"{baseUrl}/screenshots/{s.FileName}",
+                s.Caption,
+                s.Likes,
+                s.CreatedAt,
+                s.UserId,
+                s.Username
+            });
+
+            return Ok(result);
         }
 
         // POST api/screenshots/upload

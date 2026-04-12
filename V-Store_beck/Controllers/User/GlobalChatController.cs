@@ -12,10 +12,12 @@ namespace AspNetCore.WebAPI.Controllers
     public class GlobalChatController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public GlobalChatController(AppDbContext db)
+        public GlobalChatController(AppDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         // GET api/globalchat — останні 50 повідомлень
@@ -64,6 +66,48 @@ namespace AspNetCore.WebAPI.Controllers
             {
                 message.Id,
                 message.Text,
+                message.CreatedAt,
+                message.UserId,
+                Username = user.Username
+            });
+        }
+        [HttpPost("image")]
+        [Authorize]
+        public async Task<IActionResult> SendImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "Файл не вибрано" });
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null) return Unauthorized();
+
+            var ext = Path.GetExtension(file.FileName);
+            var fileName = $"global_{userId}_{DateTime.UtcNow.Ticks}{ext}";
+            var folder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "chat-images");
+            Directory.CreateDirectory(folder);
+            var path = Path.Combine(folder, fileName);
+
+            await using var stream = new FileStream(path, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            var message = new GlobalMessage
+            {
+                UserId = userId,
+                Text = "📷 Фото",
+                Type = "image",
+                ImageFileName = fileName
+            };
+
+            _db.GlobalMessages.Add(message);
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message.Id,
+                message.Text,
+                message.Type,
+                message.ImageFileName,
                 message.CreatedAt,
                 message.UserId,
                 Username = user.Username

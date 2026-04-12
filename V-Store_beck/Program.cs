@@ -75,6 +75,13 @@ app.UseStaticFiles(new StaticFileOptions
     ),
     RequestPath = "/items"
 });
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "chat-images")
+    ),
+    RequestPath = "/chat-images"
+});
 app.UseStaticFiles();
 app.UseCors("AllowReact");
 app.UseAuthentication();

@@ -43,7 +43,35 @@ namespace AspNetCore.WebAPI.Controllers
                 .Take(12)
                 .ToListAsync();
 
-            return Ok(new { user, library, screenshots });
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var userWithUrl = new {
+                user.Id,
+                user.Username,
+                Photo = user.Photo,
+                PhotoUrl = string.IsNullOrEmpty(user.Photo) ? null : $"{baseUrl}/avatars/{user.Photo}",
+                user.Role
+            };
+
+            var libraryWithUrls = library.Select(g => new {
+                g.Id,
+                g.Name,
+                g.Photo,
+                PhotoUrl = string.IsNullOrEmpty(g.Photo) ? null : $"{baseUrl}/items/{g.Photo}",
+                g.GPA,
+                g.PurchasedAt
+            });
+
+            var screenshotsWithUrls = screenshots.Select(s => new {
+                s.Id,
+                s.FileName,
+                Url = string.IsNullOrEmpty(s.FileName) ? null : $"{baseUrl}/screenshots/{s.FileName}",
+                s.Caption,
+                s.Likes,
+                s.CreatedAt
+            });
+
+            return Ok(new { user = userWithUrl, library = libraryWithUrls, screenshots = screenshotsWithUrls });
         }
 
         // GET api/profile/me — свой профиль с балансом

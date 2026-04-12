@@ -114,6 +114,11 @@ namespace AspNetCore.WebAPI.Data
                 .WithMany()
                 .HasForeignKey(i => i.GameId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.InventoryItem)
+                .WithMany()
+                .HasForeignKey(m => m.ItemId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
     }
