@@ -5,7 +5,7 @@
 namespace V_Store_beck.Migrations
 {
     /// <inheritdoc />
-    public partial class AddGlobalChat : Migration
+    public partial class AddLoginTrackingTo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

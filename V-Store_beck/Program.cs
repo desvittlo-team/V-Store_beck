@@ -37,8 +37,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
-
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
@@ -50,39 +48,15 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+// Seed database
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(db);
+}
 
-app.UseStaticFiles(); 
+app.UseStaticFiles(); // раздаёт всё из wwwroot/ включая screenshots, avatars, items, chat-images
 
-// раздача папки screenshots
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "screenshots")
-    ),
-    RequestPath = "/screenshots"
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars")
-    ),
-    RequestPath = "/avatars"
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "items")
-    ),
-    RequestPath = "/items"
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "chat-images")
-    ),
-    RequestPath = "/chat-images"
-});
-app.UseStaticFiles();
 app.UseCors("AllowReact");
 app.UseAuthentication();
 app.UseAuthorization();

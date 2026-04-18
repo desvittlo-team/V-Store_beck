@@ -5,7 +5,7 @@
 namespace V_Store_beck.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProfile : Migration
+    public partial class AddLoginTrackingToUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
