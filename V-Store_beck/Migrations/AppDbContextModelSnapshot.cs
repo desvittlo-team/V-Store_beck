@@ -909,6 +909,32 @@ namespace V_Store_beck.Migrations
                     b.ToTable("UserGames");
                 });
 
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.WishlistItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WishlistItems");
+                });
+
             modelBuilder.Entity("AspNetCore.WebAPI.Models.CartItem", b =>
                 {
                     b.HasOne("AspNetCore.WebAPI.Models.Game", "Game")
@@ -1056,6 +1082,25 @@ namespace V_Store_beck.Migrations
                 });
 
             modelBuilder.Entity("AspNetCore.WebAPI.Models.UserGame", b =>
+                {
+                    b.HasOne("AspNetCore.WebAPI.Models.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AspNetCore.WebAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.WishlistItem", b =>
                 {
                     b.HasOne("AspNetCore.WebAPI.Models.Game", "Game")
                         .WithMany()
