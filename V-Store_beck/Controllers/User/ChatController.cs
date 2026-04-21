@@ -110,6 +110,7 @@ namespace AspNetCore.WebAPI.Controllers
                     Text = m.Text,
                     Type = m.Type,
                     Amount = m.Amount,
+                    ImageFileName = m.ImageFileName,
                     CreatedAt = m.CreatedAt,
                     IsRead = m.IsRead,
                     SenderId = m.SenderId,
