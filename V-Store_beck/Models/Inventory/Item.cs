@@ -17,6 +17,9 @@ namespace AspNetCore.WebAPI.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
+        // тип предмета
+        public string ItemType { get; set; } = "other";
+
         public int GameId { get; set; }
         public Game Game { get; set; } = null!;
 

@@ -120,6 +120,17 @@ namespace AspNetCore.WebAPI.Data
                 .WithMany()
                 .HasForeignKey(m => m.ItemId)
                 .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<User>()
+                .Property(u => u.Balance)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Game>()
+                .Property(g => g.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Item>()
+                .Property(i => i.Price)
+                .HasPrecision(18, 2);
         }
 
     }

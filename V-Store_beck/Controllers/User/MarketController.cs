@@ -20,7 +20,6 @@ namespace AspNetCore.WebAPI.Controllers
             _env = env;
         }
 
-        // GET api/market — все предметы
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -35,6 +34,7 @@ namespace AspNetCore.WebAPI.Controllers
                     i.Description,
                     i.Photo,
                     i.Price,
+                    i.ItemType,
                     i.CreatedAt,
                     Game = new { i.Game.Id, i.Game.Name },
                     Seller = new { i.Seller.Id, i.Seller.Username }
@@ -44,7 +44,6 @@ namespace AspNetCore.WebAPI.Controllers
             return Ok(items);
         }
 
-        // POST api/market — выставить предмет
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateListing([FromForm] CreateItemRequest request, IFormFile? file)
@@ -52,18 +51,33 @@ namespace AspNetCore.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(request.Name) || request.Price <= 0)
                 return BadRequest(new { message = "Назва та ціна обов'язкові" });
 
+            var validTypes = new[] { "skin", "avatar", "sticker", "profile_background", "game_item", "collectible", "other" };
+
+            var itemType = request.ItemType.ToLower();
+            if (!validTypes.Contains(itemType))
+                return BadRequest(new { message = "Невірний тип предмета" });
+
             var gameExists = await _db.Game.AnyAsync(g => g.Id == request.GameId);
-            if (!gameExists) return NotFound(new { message = "Гру не знайдено" });
+            if (!gameExists)
+                return NotFound(new { message = "Гру не знайдено" });
 
             var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             string photoName = "default_item.png";
+
             if (file != null && file.Length > 0)
             {
-                var ext = Path.GetExtension(file.FileName);
+                var ext = Path.GetExtension(file.FileName).ToLower();
+                var allowed = new[] { ".jpg", ".png", ".webp" };
+
+                if (!allowed.Contains(ext))
+                    return BadRequest(new { message = "Неприпустимий формат файлу" });
+
                 photoName = $"item_{sellerId}_{DateTime.UtcNow.Ticks}{ext}";
                 var folder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "items");
+
                 Directory.CreateDirectory(folder);
+
                 var path = Path.Combine(folder, photoName);
                 await using var stream = new FileStream(path, FileMode.Create);
                 await file.CopyToAsync(stream);
@@ -75,6 +89,7 @@ namespace AspNetCore.WebAPI.Controllers
                 Description = request.Description?.Trim(),
                 Photo = photoName,
                 Price = request.Price,
+                ItemType = itemType,
                 GameId = request.GameId,
                 SellerId = sellerId
             };
@@ -82,23 +97,28 @@ namespace AspNetCore.WebAPI.Controllers
             _db.Items.Add(item);
             await _db.SaveChangesAsync();
 
-            return Ok(new { item.Id, item.Name, item.Price, item.Photo });
+            return Ok(new { item.Id, item.Name, item.Price, item.Photo, item.ItemType });
         }
 
-        // POST api/market/{id}/buy — купить предмет
         [HttpPost("{id}/buy")]
         [Authorize]
         public async Task<IActionResult> Buy(int id)
         {
             var buyerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+            using var transaction = await _db.Database.BeginTransactionAsync();
+
             var item = await _db.Items
-                .Include(i => i.Seller)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
-            if (item == null) return NotFound(new { message = "Предмет не знайдено" });
-            if (item.IsSold) return BadRequest(new { message = "Предмет вже продано" });
-            if (item.SellerId == buyerId) return BadRequest(new { message = "Не можна купити свій предмет" });
+            if (item == null)
+                return NotFound(new { message = "Предмет не знайдено" });
+
+            if (item.IsSold)
+                return BadRequest(new { message = "Предмет вже продано" });
+
+            if (item.SellerId == buyerId)
+                return BadRequest(new { message = "Не можна купити свій предмет" });
 
             var buyer = await _db.Users.FindAsync(buyerId);
             if (buyer == null) return Unauthorized();
@@ -106,17 +126,14 @@ namespace AspNetCore.WebAPI.Controllers
             if (buyer.Balance < item.Price)
                 return BadRequest(new { message = "Недостатньо коштів" });
 
-            // списываем деньги у покупателя
-            buyer.Balance -= item.Price;
-
-            // добавляем деньги продавцу
             var seller = await _db.Users.FindAsync(item.SellerId);
-            if (seller != null) seller.Balance += item.Price;
 
-            // помечаем как проданный
+            buyer.Balance -= item.Price;
+            if (seller != null)
+                seller.Balance += item.Price;
+
             item.IsSold = true;
 
-            // добавляем в инвентарь покупателя
             _db.InventoryItems.Add(new InventoryItem
             {
                 UserId = buyerId,
@@ -124,37 +141,40 @@ namespace AspNetCore.WebAPI.Controllers
             });
 
             await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
 
             return Ok(new { message = "Куплено!", balance = buyer.Balance });
         }
 
-        // DELETE api/market/{id} — снять с продажи
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var item = await _db.Items.FindAsync(id);
             if (item == null) return NotFound();
-            if (item.SellerId != userId) return Forbid();
-            if (item.IsSold) return BadRequest(new { message = "Предмет вже продано" });
+
+            if (item.SellerId != userId && !User.IsInRole("Admin"))
+                return Forbid();
+
+            if (item.IsSold)
+                return BadRequest(new { message = "Предмет вже продано" });
 
             _db.Items.Remove(item);
             await _db.SaveChangesAsync();
+
             return Ok(new { message = "Знято з продажу" });
         }
 
-        // GET api/market/inventory — свой инвентарь
         [HttpGet("inventory")]
         [Authorize]
         public async Task<IActionResult> GetInventory()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
             var inventory = await _db.InventoryItems
                 .Where(ii => ii.UserId == userId)
-                .Include(ii => ii.Item)
-                    .ThenInclude(i => i.Game)
+                .Include(ii => ii.Item).ThenInclude(i => i.Game)
                 .OrderByDescending(ii => ii.AcquiredAt)
                 .Select(ii => new {
                     ii.Id,
@@ -166,15 +186,14 @@ namespace AspNetCore.WebAPI.Controllers
                         ii.Item.Photo,
                         ii.Item.Price,
                         ii.Item.Description,
+                        ii.Item.ItemType,
                         Game = new { ii.Item.Game.Id, ii.Item.Game.Name }
                     }
                 })
                 .ToListAsync();
-
             return Ok(inventory);
         }
 
-        // POST api/market/inventory/{inventoryItemId}/sell — юзер выставляет свой предмет
         [HttpPost("inventory/{inventoryItemId}/sell")]
         [Authorize]
         public async Task<IActionResult> SellFromInventory(int inventoryItemId, [FromBody] SellItemRequest request)
@@ -191,50 +210,50 @@ namespace AspNetCore.WebAPI.Controllers
             if (request.Price <= 0)
                 return BadRequest(new { message = "Ціна повинна бути більше 0" });
 
-            // создаём новый лот на рынке
             var newItem = new Item
             {
                 Name = invItem.Item.Name,
                 Description = invItem.Item.Description,
                 Photo = invItem.Item.Photo,
                 Price = request.Price,
+                ItemType = invItem.Item.ItemType,
                 GameId = invItem.Item.GameId,
                 SellerId = userId
             };
 
             _db.Items.Add(newItem);
+            await _db.SaveChangesAsync(); // сначала сохраняем
 
-            // удаляем из инвентаря
             _db.InventoryItems.Remove(invItem);
-
             await _db.SaveChangesAsync();
 
-            return Ok(new { newItem.Id, newItem.Name, newItem.Price });
+            return Ok(new { newItem.Id, newItem.Name, newItem.Price, newItem.ItemType });
         }
 
-        // GET api/market/inventory/my — инвентарь для продажи
         [HttpGet("inventory/my")]
         [Authorize]
         public async Task<IActionResult> GetMyInventory()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
             var inventory = await _db.InventoryItems
                 .Where(ii => ii.UserId == userId)
-                .Include(ii => ii.Item)
-                    .ThenInclude(i => i.Game)
+                .Include(ii => ii.Item).ThenInclude(i => i.Game)
                 .OrderByDescending(ii => ii.AcquiredAt)
                 .Select(ii => new {
                     ii.Id,
                     ii.AcquiredAt,
-                    Item = new {
-                        ii.Item.Id, ii.Item.Name, ii.Item.Photo,
-                        ii.Item.Price, ii.Item.Description,
+                    Item = new
+                    {
+                        ii.Item.Id,
+                        ii.Item.Name,
+                        ii.Item.Photo,
+                        ii.Item.Price,
+                        ii.Item.Description,
+                        ii.Item.ItemType,
                         Game = new { ii.Item.Game.Id, ii.Item.Game.Name }
                     }
                 })
                 .ToListAsync();
-
             return Ok(inventory);
         }
     }
@@ -245,11 +264,11 @@ namespace AspNetCore.WebAPI.Controllers
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public int GameId { get; set; }
+        public string ItemType { get; set; } = "other";
     }
 
     public class SellItemRequest
     {
         public decimal Price { get; set; }
     }
-
 }
