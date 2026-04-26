@@ -24,6 +24,7 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<InventoryItem> InventoryItems { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
         public DbSet<Message> Messages { get; set; }  // <- добавь эту ст
         protected override void OnModelCreating(ModelBuilder modelBuilder)
