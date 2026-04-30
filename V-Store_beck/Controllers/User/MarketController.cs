@@ -68,8 +68,8 @@ namespace AspNetCore.WebAPI.Controllers
             if (file != null && file.Length > 0)
             {
                 var ext = Path.GetExtension(file.FileName).ToLower();
-                var allowed = new[] { ".jpg", ".png", ".webp" };
-
+                var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+                
                 if (!allowed.Contains(ext))
                     return BadRequest(new { message = "Неприпустимий формат файлу" });
 

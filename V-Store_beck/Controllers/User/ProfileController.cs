@@ -59,9 +59,14 @@ namespace AspNetCore.WebAPI.Controllers
                     user.Role,
                     Bio = profile?.Bio,
                     BackgroundUrl = profile?.BackgroundUrl,
+                    BannerUrl = profile?.BannerUrl,
                     HideComments = profile?.HideComments ?? false,
                     PrivateLibrary = profile?.PrivateLibrary ?? false,
                     ShowOnline = profile?.ShowOnline ?? true,
+                    HideBadges = profile?.HideBadges ?? false,
+                    HideGames = profile?.HideGames ?? false,
+                    HideDiscussions = profile?.HideDiscussions ?? false,
+                    HideFriends = profile?.HideFriends ?? false,
                 },
                 library = library.Select(g => new
                 {
@@ -124,9 +129,14 @@ namespace AspNetCore.WebAPI.Controllers
                     user.Balance,
                     Bio = profile?.Bio,
                     BackgroundUrl = profile?.BackgroundUrl,
+                    BannerUrl = profile?.BannerUrl,
                     HideComments = profile?.HideComments ?? false,
                     PrivateLibrary = profile?.PrivateLibrary ?? false,
                     ShowOnline = profile?.ShowOnline ?? true,
+                    HideBadges = profile?.HideBadges ?? false,
+                    HideGames = profile?.HideGames ?? false,
+                    HideDiscussions = profile?.HideDiscussions ?? false,
+                    HideFriends = profile?.HideFriends ?? false,
                 },
                 library,
                 screenshots
@@ -149,14 +159,14 @@ namespace AspNetCore.WebAPI.Controllers
                 user.Username = request.Username.Trim();
             }
 
-            // Avatar file — уже через POST /avatar, но и из инвентаря
+            // Avatar file — вже через POST /avatar, але й з інвентарю
             if (request.AvatarInventoryItemId.HasValue)
             {
                 var invItem = await _db.InventoryItems
                     .Include(i => i.Item)
                     .FirstOrDefaultAsync(i => i.Id == request.AvatarInventoryItemId.Value && i.UserId == myId);
                 if (invItem != null)
-                    user.Photo = invItem.Item.Photo;
+                    user.Photo = $"items/{invItem.Item.Photo}"; 
             }
 
             await _db.SaveChangesAsync();
@@ -172,18 +182,34 @@ namespace AspNetCore.WebAPI.Controllers
             if (request.Bio != null)
                 profile.Bio = request.Bio;
 
+            // Фон з інвентарю
             if (request.BackgroundInventoryItemId.HasValue)
             {
                 var invItem = await _db.InventoryItems
                     .Include(i => i.Item)
                     .FirstOrDefaultAsync(i => i.Id == request.BackgroundInventoryItemId.Value && i.UserId == myId);
                 if (invItem != null)
-                    profile.BackgroundUrl = $"{Request.Scheme}://{Request.Host}/items/{invItem.Item.Photo}";
+                    profile.BackgroundUrl = invItem.Item.Photo; // только имя файла
+            }
+
+            // Баннер з інвентарю
+            if (request.BannerInventoryItemId.HasValue)
+            {
+                var invItem = await _db.InventoryItems
+                    .Include(i => i.Item)
+                    .FirstOrDefaultAsync(i => i.Id == request.BannerInventoryItemId.Value && i.UserId == myId);
+                if (invItem != null)
+                    profile.BannerUrl = invItem.Item.Photo; // только имя файла
             }
 
             if (request.HideComments.HasValue) profile.HideComments = request.HideComments.Value;
             if (request.PrivateLibrary.HasValue) profile.PrivateLibrary = request.PrivateLibrary.Value;
             if (request.ShowOnline.HasValue) profile.ShowOnline = request.ShowOnline.Value;
+
+            if (request.HideBadges.HasValue) profile.HideBadges = request.HideBadges.Value;
+            if (request.HideGames.HasValue) profile.HideGames = request.HideGames.Value;
+            if (request.HideDiscussions.HasValue) profile.HideDiscussions = request.HideDiscussions.Value;
+            if (request.HideFriends.HasValue) profile.HideFriends = request.HideFriends.Value;
 
             await _db.SaveChangesAsync();
 
@@ -196,9 +222,14 @@ namespace AspNetCore.WebAPI.Controllers
                 user.Balance,
                 Bio = profile.Bio,
                 BackgroundUrl = profile.BackgroundUrl,
+                BannerUrl = profile.BannerUrl,
                 HideComments = profile.HideComments,
                 PrivateLibrary = profile.PrivateLibrary,
                 ShowOnline = profile.ShowOnline,
+                HideBadges = profile.HideBadges,
+                HideGames = profile.HideGames,
+                HideDiscussions = profile.HideDiscussions,
+                HideFriends = profile.HideFriends,
             });
         }
 
@@ -243,8 +274,13 @@ namespace AspNetCore.WebAPI.Controllers
         public string? Bio { get; set; }
         public int? AvatarInventoryItemId { get; set; }
         public int? BackgroundInventoryItemId { get; set; }
+        public int? BannerInventoryItemId { get; set; } // новое
         public bool? HideComments { get; set; }
         public bool? PrivateLibrary { get; set; }
         public bool? ShowOnline { get; set; }
+        public bool? HideBadges { get; set; } // новые  
+        public bool? HideGames { get; set; }
+        public bool? HideDiscussions { get; set; }
+        public bool? HideFriends { get; set; }
     }
 }

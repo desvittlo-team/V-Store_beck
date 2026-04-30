@@ -28,7 +28,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\screenshots\" />
     <Folder Include="wwwroot\avatars\" />
-    <Folder Include="wwwroot\items\" />
     <Folder Include="wwwroot\chat-images\" />
   </ItemGroup>
 

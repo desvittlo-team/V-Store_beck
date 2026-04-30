@@ -174,6 +174,11 @@ namespace AspNetCore.WebAPI.Data
             modelBuilder.Entity<Item>()
                 .Property(i => i.Price)
                 .HasPrecision(18, 2);
+            modelBuilder.Entity<UserProfile>()
+                .HasOne(p => p.User)
+                .WithOne()
+                .HasForeignKey<UserProfile>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

@@ -20,8 +20,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://localhost:5173",
                 "https://localhost:5173",
-                "http://localhost:3000",
-                "https://localhost:3000"
+                "http://192.168.0.104:5173",
+                "https://192.168.0.104:5173"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -55,16 +55,22 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
-// Seed database
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await DbSeeder.SeedAsync(db);
 }
 
-app.UseStaticFiles(); // раздаёт всё из wwwroot/ включая screenshots, avatars, items, chat-images
-
 app.UseCors("AllowReact");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
