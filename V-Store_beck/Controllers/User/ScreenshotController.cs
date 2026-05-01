@@ -121,5 +121,54 @@ namespace AspNetCore.WebAPI.Controllers
             await _db.SaveChangesAsync();
             return Ok(new { message = "Видалено" });
         }
+        // GET api/screenshots/my — мои скриншоты (для витрин)
+        [HttpGet("my")]
+        [Authorize]
+        public async Task<IActionResult> GetMy()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var screenshots = await _db.Screenshots
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.CreatedAt)
+                .Select(s => new {
+                    s.Id,
+                    s.FileName,
+                    Url = $"{baseUrl}/screenshots/{s.FileName}",
+                    s.Caption,
+                    s.Likes,
+                    s.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(screenshots);
+        }
+
+        // GET api/screenshots/game/{gameId} — скриншоты по игре (для Спільноти)
+        [HttpGet("game/{gameId}")]
+        public async Task<IActionResult> GetByGame(int gameId)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var screenshots = await _db.Screenshots
+                .Include(s => s.User)
+                .Where(s => s.GameId == gameId)
+                .OrderByDescending(s => s.CreatedAt)
+                .Select(s => new {
+                    s.Id,
+                    s.FileName,
+                    Url = $"{baseUrl}/screenshots/{s.FileName}",
+                    s.Caption,
+                    s.Likes,
+                    s.CreatedAt,
+                    s.UserId,
+                    Username = s.User.Username,
+                    UserPhoto = s.User.Photo
+                })
+                .ToListAsync();
+
+            return Ok(screenshots);
+        }
     }
 }

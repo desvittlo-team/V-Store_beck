@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using V_Store_beck.Models.Social;
 
 namespace AspNetCore.WebAPI.Controllers
 {

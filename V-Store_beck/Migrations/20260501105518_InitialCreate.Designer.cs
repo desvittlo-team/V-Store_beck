@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace V_Store_beck.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260425163354_AddItemType")]
-    partial class AddItemType
+    [Migration("20260501105518_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,6 +106,7 @@ namespace V_Store_beck.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Surname")
@@ -596,6 +597,426 @@ namespace V_Store_beck.Migrations
                             Photo = "outer_wilds.png",
                             Price = 24.99m,
                             Surname = "Mobius Digital"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Age = 65,
+                            GPA = 9.1999999999999993,
+                            Name = "Forza Horizon 5",
+                            Photo = "forza5.png",
+                            Price = 59.99m,
+                            Surname = "Playground Games"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Age = 58,
+                            GPA = 8.6999999999999993,
+                            Name = "Gran Turismo 7",
+                            Photo = "gt7.png",
+                            Price = 69.99m,
+                            Surname = "Polyphony Digital"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Age = 85,
+                            GPA = 9.5,
+                            Name = "Need for Speed: Underground 2",
+                            Photo = "nfsu2.png",
+                            Price = 9.99m,
+                            Surname = "EA Black Box"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Age = 92,
+                            GPA = 9.8000000000000007,
+                            Name = "Silent Hill 2",
+                            Photo = "sh2.png",
+                            Price = 14.99m,
+                            Surname = "Team Silent"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            Age = 74,
+                            GPA = 9.0,
+                            Name = "Amnesia: The Dark Descent",
+                            Photo = "amnesia.png",
+                            Price = 19.99m,
+                            Surname = "Frictional Games"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            Age = 25,
+                            GPA = 8.8000000000000007,
+                            Name = "Phasmophobia",
+                            Photo = "phasmophobia.png",
+                            Price = 13.99m,
+                            Surname = "Kinetic Games"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            Age = 45,
+                            GPA = 9.6999999999999993,
+                            Name = "Celeste",
+                            Photo = "celeste.png",
+                            Price = 19.99m,
+                            Surname = "Extremely OK Games"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            Age = 66,
+                            GPA = 9.9000000000000004,
+                            Name = "Undertale",
+                            Photo = "undertale.png",
+                            Price = 9.99m,
+                            Surname = "Toby Fox"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            Age = 55,
+                            GPA = 9.8000000000000007,
+                            Name = "Persona 5 Royal",
+                            Photo = "p5r.png",
+                            Price = 59.99m,
+                            Surname = "Atlus"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            Age = 60,
+                            GPA = 9.4000000000000004,
+                            Name = "NieR:Automata",
+                            Photo = "nier.png",
+                            Price = 39.99m,
+                            Surname = "PlatinumGames"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            Age = 82,
+                            GPA = 9.9000000000000004,
+                            Name = "God of War",
+                            Photo = "gow.png",
+                            Price = 49.99m,
+                            Surname = "Santa Monica Studio"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            Age = 50,
+                            GPA = 9.0999999999999996,
+                            Name = "Tony Hawk's Pro Skater 1+2",
+                            Photo = "thps.png",
+                            Price = 39.99m,
+                            Surname = "Vicarious Visions"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            Age = 10,
+                            GPA = 7.5,
+                            Name = "EA SPORTS FC 24",
+                            Photo = "fc24.png",
+                            Price = 69.99m,
+                            Surname = "EA Sports"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            Age = 68,
+                            GPA = 8.9000000000000004,
+                            Name = "Cities: Skylines",
+                            Photo = "cities_skylines.png",
+                            Price = 29.99m,
+                            Surname = "Colossal Order"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            Age = 75,
+                            GPA = 9.5999999999999996,
+                            Name = "Euro Truck Simulator 2",
+                            Photo = "ets2.png",
+                            Price = 19.99m,
+                            Surname = "SCS Software"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            Age = 40,
+                            GPA = 9.1999999999999993,
+                            Name = "Microsoft Flight Simulator",
+                            Photo = "mfs.png",
+                            Price = 59.99m,
+                            Surname = "Asobo Studio"
+                        },
+                        new
+                        {
+                            Id = 65,
+                            Age = 53,
+                            GPA = 9.5,
+                            Name = "Subnautica",
+                            Photo = "subnautica.png",
+                            Price = 29.99m,
+                            Surname = "Unknown Worlds"
+                        },
+                        new
+                        {
+                            Id = 66,
+                            Age = 61,
+                            GPA = 9.3000000000000007,
+                            Name = "Don't Starve Together",
+                            Photo = "dont_starve.png",
+                            Price = 14.99m,
+                            Surname = "Klei Entertainment"
+                        },
+                        new
+                        {
+                            Id = 67,
+                            Age = 48,
+                            GPA = 9.4000000000000004,
+                            Name = "Dead Cells",
+                            Photo = "dead_cells.png",
+                            Price = 24.99m,
+                            Surname = "Motion Twin"
+                        },
+                        new
+                        {
+                            Id = 68,
+                            Age = 38,
+                            GPA = 9.6999999999999993,
+                            Name = "Slay the Spire",
+                            Photo = "slaythespire.png",
+                            Price = 24.99m,
+                            Surname = "Mega Crit Games"
+                        },
+                        new
+                        {
+                            Id = 69,
+                            Age = 42,
+                            GPA = 9.5,
+                            Name = "Beat Saber",
+                            Photo = "beatsaber.png",
+                            Price = 29.99m,
+                            Surname = "Beat Games"
+                        },
+                        new
+                        {
+                            Id = 70,
+                            Age = 12,
+                            GPA = 8.5,
+                            Name = "Among Us",
+                            Photo = "amongus.png",
+                            Price = 4.99m,
+                            Surname = "Innersloth"
+                        },
+                        new
+                        {
+                            Id = 71,
+                            Age = 18,
+                            GPA = 8.1999999999999993,
+                            Name = "Fall Guys",
+                            Photo = "fallguys.png",
+                            Price = 0m,
+                            Surname = "Mediatonic"
+                        },
+                        new
+                        {
+                            Id = 72,
+                            Age = 77,
+                            GPA = 9.5999999999999996,
+                            Name = "Super Smash Bros. Ultimate",
+                            Photo = "ssbu.png",
+                            Price = 59.99m,
+                            Surname = "Bandai Namco"
+                        },
+                        new
+                        {
+                            Id = 73,
+                            Age = 5,
+                            GPA = 9.0999999999999996,
+                            Name = "Tekken 8",
+                            Photo = "tekken8.png",
+                            Price = 69.99m,
+                            Surname = "Bandai Namco"
+                        },
+                        new
+                        {
+                            Id = 74,
+                            Age = 8,
+                            GPA = 8.5999999999999996,
+                            Name = "Mortal Kombat 1",
+                            Photo = "mk1.png",
+                            Price = 69.99m,
+                            Surname = "NetherRealm Studios"
+                        },
+                        new
+                        {
+                            Id = 75,
+                            Age = 22,
+                            GPA = 8.8000000000000007,
+                            Name = "Genshin Impact",
+                            Photo = "genshin.png",
+                            Price = 0m,
+                            Surname = "HoYoverse"
+                        },
+                        new
+                        {
+                            Id = 76,
+                            Age = 85,
+                            GPA = 9.0,
+                            Name = "League of Legends",
+                            Photo = "lol.png",
+                            Price = 0m,
+                            Surname = "Riot Games"
+                        },
+                        new
+                        {
+                            Id = 77,
+                            Age = 30,
+                            GPA = 8.9000000000000004,
+                            Name = "Valorant",
+                            Photo = "valorant.png",
+                            Price = 0m,
+                            Surname = "Riot Games"
+                        },
+                        new
+                        {
+                            Id = 78,
+                            Age = 15,
+                            GPA = 7.9000000000000004,
+                            Name = "Overwatch 2",
+                            Photo = "ow2.png",
+                            Price = 0m,
+                            Surname = "Blizzard Entertainment"
+                        },
+                        new
+                        {
+                            Id = 79,
+                            Age = 35,
+                            GPA = 8.6999999999999993,
+                            Name = "Apex Legends",
+                            Photo = "apex.png",
+                            Price = 0m,
+                            Surname = "Respawn Entertainment"
+                        },
+                        new
+                        {
+                            Id = 80,
+                            Age = 45,
+                            GPA = 9.0999999999999996,
+                            Name = "Fortnite",
+                            Photo = "fortnite.png",
+                            Price = 0m,
+                            Surname = "Epic Games"
+                        },
+                        new
+                        {
+                            Id = 81,
+                            Age = 55,
+                            GPA = 9.8000000000000007,
+                            Name = "Return of the Obra Dinn",
+                            Photo = "obradinn.png",
+                            Price = 19.99m,
+                            Surname = "Lucas Pope"
+                        },
+                        new
+                        {
+                            Id = 82,
+                            Age = 62,
+                            GPA = 8.9000000000000004,
+                            Name = "The Witness",
+                            Photo = "thewitness.png",
+                            Price = 39.99m,
+                            Surname = "Thekla, Inc."
+                        },
+                        new
+                        {
+                            Id = 83,
+                            Age = 58,
+                            GPA = 9.3000000000000007,
+                            Name = "The Talos Principle",
+                            Photo = "talos.png",
+                            Price = 29.99m,
+                            Surname = "Croteam"
+                        },
+                        new
+                        {
+                            Id = 84,
+                            Age = 88,
+                            GPA = 9.5999999999999996,
+                            Name = "Age of Empires II: Def. Ed.",
+                            Photo = "aoe2.png",
+                            Price = 19.99m,
+                            Surname = "Forgotten Empires"
+                        },
+                        new
+                        {
+                            Id = 85,
+                            Age = 71,
+                            GPA = 9.1999999999999993,
+                            Name = "XCOM 2",
+                            Photo = "xcom2.png",
+                            Price = 59.99m,
+                            Surname = "Firaxis Games"
+                        },
+                        new
+                        {
+                            Id = 86,
+                            Age = 64,
+                            GPA = 9.0999999999999996,
+                            Name = "Darkest Dungeon",
+                            Photo = "darkestdungeon.png",
+                            Price = 24.99m,
+                            Surname = "Red Hook Studios"
+                        },
+                        new
+                        {
+                            Id = 87,
+                            Age = 33,
+                            GPA = 9.4000000000000004,
+                            Name = "Spelunky 2",
+                            Photo = "spelunky2.png",
+                            Price = 19.99m,
+                            Surname = "Mossmouth"
+                        },
+                        new
+                        {
+                            Id = 88,
+                            Age = 52,
+                            GPA = 9.5999999999999996,
+                            Name = "Cuphead",
+                            Photo = "cuphead.png",
+                            Price = 19.99m,
+                            Surname = "Studio MDHR"
+                        },
+                        new
+                        {
+                            Id = 89,
+                            Age = 41,
+                            GPA = 9.6999999999999993,
+                            Name = "It Takes Two",
+                            Photo = "ittakestwo.png",
+                            Price = 39.99m,
+                            Surname = "Hazelight Studios"
+                        },
+                        new
+                        {
+                            Id = 90,
+                            Age = 80,
+                            GPA = 9.9000000000000004,
+                            Name = "Factorio",
+                            Photo = "factorio.png",
+                            Price = 35.00m,
+                            Surname = "Wube Software"
                         });
                 });
 
@@ -691,6 +1112,7 @@ namespace V_Store_beck.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("SellerId")
@@ -829,6 +1251,9 @@ namespace V_Store_beck.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("GameId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Likes")
                         .HasColumnType("int");
 
@@ -837,9 +1262,82 @@ namespace V_Store_beck.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GameId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Screenshots");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.Showcase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Showcases");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.ShowcaseItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IllustrationUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("InventoryItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ScreenshotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShowcaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserGameId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventoryItemId");
+
+                    b.HasIndex("ScreenshotId");
+
+                    b.HasIndex("ShowcaseId");
+
+                    b.HasIndex("UserGameId");
+
+                    b.ToTable("ShowcaseItems");
                 });
 
             modelBuilder.Entity("AspNetCore.WebAPI.Models.User", b =>
@@ -851,6 +1349,7 @@ namespace V_Store_beck.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Balance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Email")
@@ -940,6 +1439,55 @@ namespace V_Store_beck.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("V_Store_beck.Models.Social.UserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BackgroundUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BannerUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HideBadges")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideComments")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideDiscussions")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideFriends")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HideGames")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PrivateLibrary")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("AspNetCore.WebAPI.Models.CartItem", b =>
@@ -1079,6 +1627,24 @@ namespace V_Store_beck.Migrations
 
             modelBuilder.Entity("AspNetCore.WebAPI.Models.Screenshot", b =>
                 {
+                    b.HasOne("AspNetCore.WebAPI.Models.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AspNetCore.WebAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.Showcase", b =>
+                {
                     b.HasOne("AspNetCore.WebAPI.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1086,6 +1652,38 @@ namespace V_Store_beck.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.ShowcaseItem", b =>
+                {
+                    b.HasOne("AspNetCore.WebAPI.Models.InventoryItem", "InventoryItem")
+                        .WithMany()
+                        .HasForeignKey("InventoryItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AspNetCore.WebAPI.Models.Screenshot", "Screenshot")
+                        .WithMany()
+                        .HasForeignKey("ScreenshotId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AspNetCore.WebAPI.Models.Showcase", "Showcase")
+                        .WithMany("Items")
+                        .HasForeignKey("ShowcaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AspNetCore.WebAPI.Models.UserGame", "UserGame")
+                        .WithMany()
+                        .HasForeignKey("UserGameId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("InventoryItem");
+
+                    b.Navigation("Screenshot");
+
+                    b.Navigation("Showcase");
+
+                    b.Navigation("UserGame");
                 });
 
             modelBuilder.Entity("AspNetCore.WebAPI.Models.UserGame", b =>
@@ -1126,7 +1724,23 @@ namespace V_Store_beck.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("V_Store_beck.Models.Social.UserProfile", b =>
+                {
+                    b.HasOne("AspNetCore.WebAPI.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("V_Store_beck.Models.Social.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AspNetCore.WebAPI.Models.Order", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("AspNetCore.WebAPI.Models.Showcase", b =>
                 {
                     b.Navigation("Items");
                 });

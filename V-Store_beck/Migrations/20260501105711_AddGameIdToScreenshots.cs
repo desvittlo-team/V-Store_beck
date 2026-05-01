@@ -5,7 +5,7 @@
 namespace V_Store_beck.Migrations
 {
     /// <inheritdoc />
-    public partial class FixDecimal : Migration
+    public partial class AddGameIdToScreenshots : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

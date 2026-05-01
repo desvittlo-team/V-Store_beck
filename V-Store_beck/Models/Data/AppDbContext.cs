@@ -1,10 +1,11 @@
-﻿// Data/AppDbContext.cs
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using AspNetCore.WebAPI.Models;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using V_Store_beck.Models.Social;
+using Microsoft.EntityFrameworkCore;
 
-//using VStore.Models.Catalog;
+
+
 
 namespace AspNetCore.WebAPI.Data
 {
@@ -25,6 +26,8 @@ namespace AspNetCore.WebAPI.Data
         public DbSet<InventoryItem> InventoryItems { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Showcase> Showcases { get; set; }
+        public DbSet<ShowcaseItem> ShowcaseItems { get; set; }
 
         public DbSet<Message> Messages { get; set; }  // <- добавь эту ст
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -179,6 +182,42 @@ namespace AspNetCore.WebAPI.Data
                 .WithOne()
                 .HasForeignKey<UserProfile>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Showcase>()
+                .HasOne(s => s.User)
+                .WithMany()
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ShowcaseItem>()
+                .HasOne(si => si.Showcase)
+                .WithMany(s => s.Items)
+                .HasForeignKey(si => si.ShowcaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ShowcaseItem>()
+                .HasOne(si => si.InventoryItem)
+                .WithMany()
+                .HasForeignKey(si => si.InventoryItemId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ShowcaseItem>()
+                .HasOne(si => si.Screenshot)
+                .WithMany()
+                .HasForeignKey(si => si.ScreenshotId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ShowcaseItem>()
+                .HasOne(si => si.UserGame)
+                .WithMany()
+                .HasForeignKey(si => si.UserGameId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Screenshot>()
+                .HasOne(s => s.Game)
+                .WithMany()
+                .HasForeignKey(s => s.GameId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
     }

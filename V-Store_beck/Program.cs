@@ -2,6 +2,7 @@ using AspNetCore.WebAPI.Data;
 using AspNetCore.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -61,10 +62,26 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 
+var wwwroot = builder.Environment.WebRootPath
+    ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
 app.UseCors("AllowReact");
 
+// Основной wwwroot — раздаёт /items/, /avatars/, /screenshots/ и т.д.
 app.UseStaticFiles(new StaticFileOptions
 {
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+    }
+});
+
+// Иллюстрации витрин
+Directory.CreateDirectory(Path.Combine(wwwroot, "illustrations"));
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(wwwroot, "illustrations")),
+    RequestPath = "/illustrations",
     OnPrepareResponse = ctx =>
     {
         ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
